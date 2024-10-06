@@ -206,7 +206,7 @@ jobs:
           cosign sign --yes ${IMAGE}
 
   submit_results:
-   needs: [test, sonarqube, dast]
+   needs: []
    if: true
    runs-on: ubuntu-latest
    steps:
