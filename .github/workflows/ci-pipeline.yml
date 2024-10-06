@@ -1,5 +1,5 @@
 name: Python test and build
-
+# Set it all up
 on: [push]
 
 jobs:
@@ -52,7 +52,7 @@ jobs:
           path: sonarqube-report.json
 
   build:
-    needs: test
+    needs: sonarqube
     runs-on: ubuntu-latest
     steps:
       - name: Set up QEMU
@@ -70,16 +70,16 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/devops-labs:latest
 
-  submit_results:
-    needs: [build]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+  # submit_results:
+  #   needs: [build]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+  #     - uses: azure/login@v1
+  #       with:
+  #         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Azure CLI script
-        run: |
-          ACCESS_TOKEN=$(az account get-access-to
+  #     - name: Azure CLI script
+  #       run: |
+  #         ACCESS_TOKEN=$(az account get-access-to
