@@ -146,11 +146,11 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/devops-labs:latest
 
-submit_results:
-  needs: [build]
-  if: true
-  runs-on: ubuntu-latest
-  steps:
+  submit_results:
+   needs: [build]
+   if: true
+   runs-on: ubuntu-latest
+   steps:
     - uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
