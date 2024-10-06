@@ -15,13 +15,12 @@ jobs:
 
       - name: Verify image signature
         env:
-            COSIGN_EXPERIMENTAL: "true"  # Enable keyless verification
-            IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/devops-labs:latest
-            GITHUB_ISSUER: https://token.actions.githubusercontent.com
-            CERT_IDENTITY_REGEXP: https://github.com/.*/devsecops-lab-app/.github/workflows/ci-pipeline.yml.*
+          IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/devops-labs:latest
+          GITHUB_ISSUER: https://github.com/login/oauth
+          CERT_IDENTITY_REGEXP: julia.sinclairjones@studytafensw.edu.au
         run: |
-            cosign verify "$IMAGE" --certificate-identity-regexp $CERT_IDENTITY_REGEXP --certificate-oidc-issuer $GITHUB_ISSUER
-      
+          cosign verify $IMAGE --certificate-identity-regexp $CERT_IDENTITY_REGEXP --certificate-oidc-issuer $GITHUB_ISSUER
+            
         # Deploy the app and DAST container app
       - name: Deploy Container App
         uses: azure/container-apps-deploy-action@v1
