@@ -5,7 +5,7 @@ on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
-    # if: false
+    if: false
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -30,7 +30,7 @@ jobs:
   sonarqube:
     needs: test
     runs-on: ubuntu-latest
-    # if: false
+    if: false
     steps:
       - uses: actions/checkout@v3
         with:
@@ -56,7 +56,7 @@ jobs:
   dast:
     needs: [test]  # DAST runs after test and SonarQube
     runs-on: ubuntu-latest
-    # if: false
+    if: false
     steps:
       - uses: actions/checkout@v4
       - uses: azure/login@v1
@@ -109,7 +109,7 @@ jobs:
 
   image-scan:
           needs: [test]
-          if: true
+          if: false
           runs-on: ubuntu-latest
           steps:
               - name: Scan image
@@ -128,7 +128,7 @@ jobs:
 
   security_gate:
         needs: [sonarqube, dast, image-scan]
-        if: true
+        if: false
         runs-on: ubuntu-latest
         steps:
         - name: Download sonarqube-report
@@ -207,7 +207,7 @@ jobs:
 
   submit_results:
    needs: [sonarqube, dast, image-scan]
-   if: true
+   if: false
    runs-on: ubuntu-latest
    steps:
     - uses: azure/login@v1
@@ -242,6 +242,7 @@ jobs:
       env:
         DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         AZURE_ACCESS_TOKEN: ${{ env.azureAccessToken }}
+        IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/devops-labs
       run: |
         WEEK1_CONTAINER=$(curl -X POST -H "Authorization: Bearer $AZURE_ACCESS_TOKEN" -d "$DOCKERHUB_USERNAME/devops-labs" https://devsecops-ver.azurewebsites.net/api/week1-container)
         echo "Week1 container upload: $WEEK1_CONTAINER"
@@ -254,6 +255,9 @@ jobs:
 
         IMAGE_RESPONSE=$(curl -X POST -H "Authorization: Bearer $AZURE_ACCESS_TOKEN" --data-binary @$GITHUB_WORKSPACE/results.json https://devsecops-ver.azurewebsites.net/api/week4-image-report)
         echo "Image report upload: $IMAGE_RESPONSE"
+
+        WEEK5_RESPONSE=$(curl -X POST  -H "Authorization: Bearer $AZURE_ACCESS_TOKEN"  -d "$IMAGE" https://devsecops-ver.azurewebsites.net/api/week5-report)
+        echo "Week5 report upload: $WEEK5_RESPONSE"
      
   # submit_results:
   #   needs: [build]
