@@ -5,6 +5,7 @@ on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
+    # if: false
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -29,6 +30,7 @@ jobs:
   sonarqube:
     needs: test
     runs-on: ubuntu-latest
+    # if: false
     steps:
       - uses: actions/checkout@v3
         with:
@@ -54,6 +56,7 @@ jobs:
   dast:
     needs: [test, sonarqube]  # DAST runs after test and SonarQube
     runs-on: ubuntu-latest
+    # if: false
     steps:
       - uses: actions/checkout@v4
       - uses: azure/login@v1
@@ -104,9 +107,29 @@ jobs:
          name: zap-report
          path: report_json.json
 
+  image-scan:
+          needs: [test]
+          if: true
+          runs-on: ubuntu-latest
+          steps:
+              - name: Scan image
+                uses: anchore/scan-action@v3
+                id: image-scan
+                with:
+                  image: ${{ secrets.DOCKERHUB_USERNAME }}/devops-labs:latest
+                  fail-build: false
+                  output-format: json
+              - name: Upload Image report
+                id: upload-image-report
+                uses: actions/upload-artifact@v4
+                with:
+                  name: image-report
+                  path: ${{ steps.image-scan.outputs.json }}
+
   build:
     needs: dast
     runs-on: ubuntu-latest
+    # if: false
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -131,7 +154,10 @@ jobs:
     - uses: azure/login@v1
       with:
        creds: ${{ secrets.AZURE_CREDENTIALS }}
-         
+    - name: Install jq
+      run: |
+         sudo apt-get update
+         sudo apt-get install -y jq  
     - name: Azure CLI script
       id: token-gen
       uses: azure/CLI@v1
