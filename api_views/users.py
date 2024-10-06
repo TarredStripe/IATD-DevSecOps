@@ -6,6 +6,12 @@ from app import vuln, alive
 from models.books_model import Book
 from random import randrange
 from sqlalchemy.sql import text
+from flask import Response
+from flask import Flask, request, jsonify
+
+
+def error_message_helper(msg):
+    return '{ "status": "fail", "message": "' + msg + '"}'
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -77,6 +83,14 @@ class User(db.Model):
             print(user_query)
             query = vuln_conn.cursor().executescript(user_query)
             ret = query.fetchone()
+            request_data = request.get_json()
+            if username and request_data.get('password') != username.password:
+                return Response(error_message_helper("Password is not correct for the given username."), 200, mimetype="application/json")
+            elif not username:  # User enumeration
+                return Response(error_message_helper("Username does not exist"), 200, mimetype="application/json")
+            else:
+                if (username and request_data.get('password') != username.password) or (not username):
+                    return Response(error_message_helper("Username or Password Incorrect!"), 200, mimetype="application/json")
             if ret:
                 fin_query = '{"username": "%s", "email": "%s"}' % (ret[1], ret[3])
             else:
