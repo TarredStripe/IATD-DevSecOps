@@ -5,7 +5,7 @@ on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
-    if: false
+    # if: false
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -30,7 +30,7 @@ jobs:
   sonarqube:
     needs: test
     runs-on: ubuntu-latest
-    if: false
+    # if: false
     steps:
       - uses: actions/checkout@v3
         with:
@@ -56,7 +56,7 @@ jobs:
   dast:
     needs: [test]  # DAST runs after test and SonarQube
     runs-on: ubuntu-latest
-    if: false
+    # if: false
     steps:
       - uses: actions/checkout@v4
       - uses: azure/login@v1
@@ -109,7 +109,7 @@ jobs:
 
   image-scan:
           needs: [test]
-          if: false
+          # if: false
           runs-on: ubuntu-latest
           steps:
               - name: Scan image
@@ -128,7 +128,7 @@ jobs:
 
   security_gate:
         needs: [sonarqube, dast, image-scan]
-        if: false
+        # if: false
         runs-on: ubuntu-latest
         steps:
         - name: Download sonarqube-report
@@ -207,7 +207,7 @@ jobs:
           cosign sign --yes "$IMAGE"
 
   submit_results:
-   needs: [sonarqube, dast, image-scan]
+   needs: [sonarqube, dast, image-scan, build]
    if: false
    runs-on: ubuntu-latest
    steps:
