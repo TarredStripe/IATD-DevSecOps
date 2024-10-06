@@ -34,6 +34,10 @@ jobs:
       - name: Wait for provisioning to complete
         run: sleep 120  # Wait for 2 minutes
 
+      - name: List files in workspace
+        run: ls -R $GITHUB_WORKSPACE
+      
+
       - name: Get deployed DAST app URL
         run: |
           export FQDN=$(az containerapp show -n devops-test-app -g devsecops-lab --query properties.configuration.ingress.fqdn -o tsv)
@@ -42,7 +46,7 @@ jobs:
           curl -L https://$FQDN/ui  # Follow redirects
       
           # Check if openapi3.yml exists in the repository
-          if [ -f "$GITHUB_WORKSPACE/openapi_specs/openapi3.yml" ]; then
+          if [[ -f "$GITHUB_WORKSPACE/openapi_specs/openapi3.yml" ]]; then
             # Update the file with the new URL
             sed -i "s,http://localhost:5000,https://$FQDN,g" "$GITHUB_WORKSPACE/openapi_specs/openapi3.yml"
           else
