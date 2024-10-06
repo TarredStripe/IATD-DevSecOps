@@ -29,6 +29,19 @@ def get_by_username(username):
     else:
         return Response(error_message_helper("User not found"), 404, mimetype="application/json")
 
+def get_user(username):
+    if vuln: 
+        user_query = f"SELECT * FROM users WHERE username = '{username}'"
+        print(user_query)
+        query = vuln_conn.cursor().executescript(user_query)
+        ret = query.fetchone()
+        if ret:
+            fin_query = '{"username": "%s", "email": "%s"}' % (ret[1], ret[3])
+        else:
+            fin_query = None
+    else:
+        fin_query = User.query.filter_by(username=username).first()
+    return fin_query
 
 def register_user():
     request_data = request.get_json()
