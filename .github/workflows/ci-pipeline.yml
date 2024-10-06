@@ -54,7 +54,7 @@ jobs:
           path: sonarqube-report.json
 
   dast:
-    needs: [test, sonarqube]  # DAST runs after test and SonarQube
+    needs: [test]  # DAST runs after test and SonarQube
     runs-on: ubuntu-latest
     # if: false
     steps:
@@ -175,7 +175,7 @@ jobs:
             echo "All security gates passed"
 
   build:
-    needs: dast
+    needs: security_gate
     runs-on: ubuntu-latest
     # if: false
     steps:
@@ -195,7 +195,7 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/devops-labs:latest
 
   submit_results:
-   needs: [test, sonarqube, dast, build]
+   needs: [test, sonarqube, dast]
    if: true
    runs-on: ubuntu-latest
    steps:
