@@ -175,7 +175,7 @@ jobs:
             echo "All security gates passed"
 
   build:
-    needs: []
+    needs: [test,sonarqube,dast,image-scan]
     runs-on: ubuntu-latest
     # if: false
     steps:
@@ -207,7 +207,7 @@ jobs:
           cosign sign --yes "$IMAGE"
 
   submit_results:
-   needs: [sonarqube, dast, image-scan, build]
+   needs: [build]
    if: false
    runs-on: ubuntu-latest
    steps:
