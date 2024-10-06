@@ -208,7 +208,7 @@ jobs:
 
   submit_results:
    needs: [build]
-   if: false
+  #  if: false
    runs-on: ubuntu-latest
    steps:
     - uses: azure/login@v1
